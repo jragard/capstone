@@ -1,12 +1,36 @@
 from overdrive.forms import SignupForm, LoginForm
+from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
 from django.shortcuts import reverse, render, HttpResponseRedirect, redirect
 from django.contrib.auth import login, authenticate, logout
 
 
 def home_view(request):
+    books = Book.objects.all()
+    
+    books_lst = []
 
-    return render(request, 'homepage.html')
+    for x in books:
+        print(x)
+        books_lst.append(x.title.replace(' ', '_'))
+
+    print(books_lst)
+
+    return render(request, 'homepage.html', {'books': books,
+                                             'urls': books_lst,
+                                             })
+
+
+# def pride_view(request):
+#     return render(request, 'pride_and_prejudice.html')
+
+
+def content_view(request, url):
+    html = 'content/' + url + '.html'
+    print(html)
+
+    return render(request, html)
+
 
 def signup_view(request):
 
@@ -16,8 +40,14 @@ def signup_view(request):
 
     if form.is_valid():
         data = form.cleaned_data
+
         user = User.objects.create_user(
             data['username'], data['email'], data['password']
+        )
+
+        OverdriveUser.objects.create(
+            username=data['username'],
+            user=user
         )
 
         login(request, user)

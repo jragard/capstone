@@ -1,1 +1,11 @@
-<h1>HOMEPAGE</h1>
+<h3>Homepage</h3>
+
+<body>
+    <ul>
+        {% for item in books %}
+            <li>
+                <a href="/html/content/{{item}}">{{ item.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>

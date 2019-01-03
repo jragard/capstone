@@ -1,3 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    checked_out_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title.replace(' ', '_')
+
+
+class OverdriveUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=12)
+    books_checked_out = models.ManyToManyField(Book)
+
+    def __str__(self):
+        return self.username
+
