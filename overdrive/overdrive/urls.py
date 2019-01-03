@@ -17,7 +17,7 @@ from django.urls import path
 from django.contrib import admin
 
 from overdrive.models import Book
-from overdrive.views import home_view, signup_view, login_view, content_view
+from overdrive.views import home_view, signup_view, login_view, logout_view, content_view
 
 admin.site.register(Book)
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='homepage'),
     path('signup/', signup_view),
-    path('login/', login_view),
-    path('html/content/<str:url>', content_view)
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view),
+    path('html/content/<str:url>', content_view),
 ]

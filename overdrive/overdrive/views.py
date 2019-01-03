@@ -3,15 +3,22 @@ from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
 from django.shortcuts import reverse, render, HttpResponseRedirect, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 
 
 def home_view(request):
     books = Book.objects.all()
+    users = OverdriveUser.objects.all()
+
+    print(request.user.id)
+
+    # for x in users:
+    #     print(x)
     
     books_lst = []
 
     for x in books:
-        print(x)
+        # print(x)
         books_lst.append(x.title.replace(' ', '_'))
 
     print(books_lst)
@@ -21,11 +28,10 @@ def home_view(request):
                                              })
 
 
-# def pride_view(request):
-#     return render(request, 'pride_and_prejudice.html')
-
-
 def content_view(request, url):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
+
     html = 'content/' + url + '.html'
     print(html)
 
@@ -71,3 +77,8 @@ def login_view(request):
             return HttpResponseRedirect(reverse('homepage'))
 
     return render(request, html, {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('homepage'))
