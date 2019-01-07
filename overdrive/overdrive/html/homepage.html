@@ -1,5 +1,14 @@
 <h3>Homepage</h3>
 
+{% if request.user.is_authenticated %}
+<a href="/mybooks/">My Books</a>
+    <a href="/logout/">Log Out</a>
+{% endif %}
+
+{% if not request.user.is_authenticated %}
+    <a href="/login/">Log In</a>
+    <a href="/signup/">Sign Up</a>
+{% endif %}
 <body>
     <ul>
         {% for item in books %}

@@ -40,6 +40,9 @@ def content_view(request, url):
 
 def signup_view(request):
 
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('homepage'))
+
     html = 'signup.html'
 
     form = SignupForm(None or request.POST)
@@ -64,6 +67,9 @@ def signup_view(request):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('homepage'))
+
     html = 'login.html'
 
     form = LoginForm(None or request.POST)
