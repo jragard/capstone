@@ -1,7 +1,7 @@
-<h3>Do you want to check out {{ title }}</h3>
+<h3>You do not have {{ title }} checked out, but it is available.  Would you like to check it out?</h3>
 
 <form action="/thanks/" method="post">
     {% csrf_token %}
     <input type="hidden" value="{{ title }}" name="title">
-    <input type="submit" value="Yes"></input>
+    <input type="submit" value="Check Out"></input>
 </form>

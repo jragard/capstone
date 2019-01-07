@@ -19,7 +19,16 @@ def home_view(request):
 
 
 def mybooks_view(request):
-    return render(request, 'mybooks.html')
+    current_user = OverdriveUser.objects.get(id=request.user.id)
+
+    display_books_list = []
+    books_list = []
+
+    for book in current_user.books_checked_out.all():
+        books_list.append(book.title)
+        # books_list.append(book.title)
+
+    return render(request, 'mybooks.html', {'books': books_list})
 
 
 def checkout_view(request, url):

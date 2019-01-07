@@ -1,1 +1,7 @@
 <h3>Mah Books</h3>
+
+{% for book in books %}
+    <li>
+        <a href="/html/content/{{book}}">{{ book }}</a>
+    </li>
+{% endfor %}
