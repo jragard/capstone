@@ -1,9 +1,8 @@
 from overdrive.forms import SignupForm, LoginForm
 from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
-from django.shortcuts import reverse, render, HttpResponseRedirect, redirect
+from django.shortcuts import reverse, render, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
 
 
 def home_view(request):
@@ -19,14 +18,15 @@ def home_view(request):
 
 
 def mybooks_view(request):
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
     current_user = OverdriveUser.objects.get(id=request.user.id)
 
-    display_books_list = []
     books_list = []
 
     for book in current_user.books_checked_out.all():
         books_list.append(book.title)
-        # books_list.append(book.title)
 
     return render(request, 'mybooks.html', {'books': books_list})
 
