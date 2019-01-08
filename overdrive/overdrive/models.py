@@ -7,7 +7,7 @@ class Book(models.Model):
     checked_out_count = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.title.replace(' ', '_')
+        return self.title
 
 
 class OverdriveUser(models.Model):

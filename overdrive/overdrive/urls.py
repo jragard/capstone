@@ -16,10 +16,11 @@ Including another URLconf
 from django.urls import path
 from django.contrib import admin
 
-from overdrive.models import Book
-from overdrive.views import home_view, signup_view, login_view, logout_view, content_view
+from overdrive.models import Book, OverdriveUser
+from overdrive.views import home_view, signup_view, login_view, logout_view, content_view, mybooks_view, thanks_view
 
 admin.site.register(Book)
+admin.site.register(OverdriveUser)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,7 @@ urlpatterns = [
     path('signup/', signup_view),
     path('login/', login_view, name='login'),
     path('logout/', logout_view),
+    path('mybooks/', mybooks_view, name='mybooks'),
+    path('thanks/', thanks_view),
     path('html/content/<str:url>', content_view),
 ]

@@ -1,0 +1,9 @@
+<h3>My Books</h3>
+
+<a href="/">Home</a>
+<p></p>
+{% for book in books %}
+    <li>
+        <a href="/html/content/{{book}}">{{ book }}</a>
+    </li>
+{% endfor %}

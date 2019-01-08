@@ -1,0 +1,11 @@
+<a href="/">Home</a>
+<a href="/mybooks/">My Books</a>
+<a href="/logout/">Log Out</a>
+
+<h3>You do not have {{ title }} checked out, but it is available.  Would you like to check it out?</h3>
+
+<form action="/thanks/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="{{ title }}" name="title">
+    <input type="submit" value="Check Out"></input>
+</form>

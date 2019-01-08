@@ -1,41 +1,76 @@
 from overdrive.forms import SignupForm, LoginForm
 from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
-from django.shortcuts import reverse, render, HttpResponseRedirect, redirect
+from django.shortcuts import reverse, render, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
 
 
 def home_view(request):
     books = Book.objects.all()
-    users = OverdriveUser.objects.all()
-
-    print(request.user.id)
-
-    # for x in users:
-    #     print(x)
-    
     books_lst = []
 
     for x in books:
-        # print(x)
         books_lst.append(x.title.replace(' ', '_'))
-
-    print(books_lst)
 
     return render(request, 'homepage.html', {'books': books,
                                              'urls': books_lst,
                                              })
 
 
+def mybooks_view(request):
+
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
+    current_user = OverdriveUser.objects.get(id=request.user.id)
+
+    books_list = []
+
+    for book in current_user.books_checked_out.all():
+        books_list.append(book.title)
+
+    return render(request, 'mybooks.html', {'books': books_list})
+
+
+def checkout_view(request, url):
+    pass
+
+
+def thanks_view(request):
+    title = request.POST.get('title').replace(' ', '_')
+    current_user = OverdriveUser.objects.get(id=request.user.id)
+    book = Book.objects.get(title=title)
+
+    current_user.books_checked_out.add(book)
+    current_user.save()
+
+    print(current_user.books_checked_out.all())
+
+    return render(request, 'thanks.html')
+
+
 def content_view(request, url):
+    html = 'checkout.html'
+    content_html = 'content/' + url + '.html'
+
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
 
-    html = 'content/' + url + '.html'
-    print(html)
+    current_user = OverdriveUser.objects.get(id=request.user.id)
+    book = Book.objects.get(title=url)
 
-    return render(request, html)
+    books_list = []
+
+    for book in current_user.books_checked_out.all():
+        books_list.append(book.title)
+
+    if url in books_list:
+        return render(request, content_html)
+    else:
+        return render(request, html, {'title': url.replace('_', ' ')})
+
+    if url in current_user.books_checked_out.all():
+        print('yep')
+        print(current_user.books_checked_out.all().first())
 
 
 def signup_view(request):
