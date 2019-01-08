@@ -6,15 +6,30 @@ from django.contrib.auth import login, authenticate, logout
 
 
 def home_view(request):
+    print(request.user)
     books = Book.objects.all()
     books_lst = []
 
-    for x in books:
-        books_lst.append(x.title.replace(' ', '_'))
+    if request.user.is_authenticated:
+        current_user = OverdriveUser.objects.get(id=request.user.id)
+        user_books_list = [book.title for book in current_user.books_checked_out.all()]
+        print(user_books_list)
 
-    return render(request, 'homepage.html', {'books': books,
+        for book in books:
+            print(book.checked_out_count)
+            
+
+        for x in books:
+            books_lst.append(x.title.replace(' ', '_'))
+
+        return render(request, 'homepage.html', {'books': books,
                                              'urls': books_lst,
+                                             'user_books_list': user_books_list,
                                              })
+
+    else:
+        return render(request, 'homepage.html', {'books': books,
+                                                 'urls': books_lst})
 
 
 def mybooks_view(request):
@@ -39,38 +54,56 @@ def thanks_view(request):
     title = request.POST.get('title').replace(' ', '_')
     current_user = OverdriveUser.objects.get(id=request.user.id)
     book = Book.objects.get(title=title)
-
+    
     current_user.books_checked_out.add(book)
     current_user.save()
+
+    book.checked_out_count += 1
+    book.save()
+
+    checked_out_count = book.checked_out_count
+    print(checked_out_count)
 
     print(current_user.books_checked_out.all())
 
     return render(request, 'thanks.html')
 
 
+def return_view(request, url):
+    print(url)
+    current_user = OverdriveUser.objects.get(id=request.user.id)
+    book_to_return = Book.objects.get(title=url)
+
+    current_user.books_checked_out.remove(book_to_return)
+    current_user.save()
+
+    book_to_return.checked_out_count -= 1
+    book_to_return.save()
+    print(current_user.books_checked_out)
+
+
+    return render(request, 'return_thanks.html')
+
+
 def content_view(request, url):
     html = 'checkout.html'
     content_html = 'content/' + url + '.html'
+    unavailable_html = 'sorry.html'
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
 
     current_user = OverdriveUser.objects.get(id=request.user.id)
     book = Book.objects.get(title=url)
+    books_list = [bk for bk in current_user.books_checked_out.all()]
 
-    books_list = []
-
-    for book in current_user.books_checked_out.all():
-        books_list.append(book.title)
-
-    if url in books_list:
-        return render(request, content_html)
+    for bk in books_list:
+        if url == bk.title:
+            return render(request, content_html)
+    if url not in books_list and book.checked_out_count == 3:
+        return render(request, unavailable_html)
     else:
         return render(request, html, {'title': url.replace('_', ' ')})
-
-    if url in current_user.books_checked_out.all():
-        print('yep')
-        print(current_user.books_checked_out.all().first())
 
 
 def signup_view(request):
