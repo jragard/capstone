@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Book(models.Model):
     title = models.CharField(max_length=100)
     checked_out_count = models.IntegerField(default=0)
+    hold_list = models.ManyToManyField(User)
 
     def __str__(self):
         return self.title
