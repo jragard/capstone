@@ -19,6 +19,7 @@ def home_view(request):
                 book.checked_out_count = 0
                 book.save()
             print(book.hold_list.all())
+            print(book.checked_out_count)
             # book.hold_list.remove(current_user.user)
             # book.save()
             books_lst.append(book.title.replace(' ', '_'))
@@ -34,7 +35,7 @@ def home_view(request):
 
 
 def mybooks_view(request):
-
+    print(request.user)
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
     current_user = OverdriveUser.objects.get(id=request.user.id)
@@ -87,9 +88,19 @@ def return_view(request, url):
     book_to_return.checked_out_count -= 1
     book_to_return.save()
 
-    # if len(hold_list) is not 0:
-    #     print(hold_list[0])
-    print(current_user.books_checked_out)
+    if len(hold_list) is not 0:
+        print('-----------')
+        print(hold_list[0])
+        print('------------')
+        user_next_in_line = OverdriveUser.objects.get(user=hold_list[0])
+        user_next_in_line.books_checked_out.add(book_to_return)
+        user_next_in_line.save()
+
+        book_to_return.hold_list.remove(current_user.user)
+        book_to_return.save()
+
+
+    # print(current_user.books_checked_out)
 
     return render(request, 'return_thanks.html')
 
