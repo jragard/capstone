@@ -13,7 +13,10 @@
     <ul>
         {% for item in books %}
             <li>
-                <a href="/html/content/{{item}}">{{ item.title }}</a>
+                <a href="/html/content/{{item}}">{{ item.title }}</a> 
+                {% if item.title in user_books_list %} 
+                <a href="/return/{{item}}"><button>Return This Book</button></a>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
