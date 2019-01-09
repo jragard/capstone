@@ -11,7 +11,8 @@ def home_view(request):
 
     if request.user.is_authenticated:
         current_user = OverdriveUser.objects.get(id=request.user.id)
-        user_books_list = [book.title for book in current_user.books_checked_out.all()]
+        user_books_list = [
+            book.title for book in current_user.books_checked_out.all()]
         print(user_books_list)
 
         for book in books:
@@ -20,14 +21,14 @@ def home_view(request):
                 book.save()
             print(book.hold_list.all())
             print(book.checked_out_count)
-            # book.hold_list.remove(current_user.user)
-            # book.save()
-            books_lst.append(book.title.replace(' ', '_'))
+
+        for x in books:
+            books_lst.append(x.title.replace(' ', '_'))
 
         return render(request, 'homepage.html', {'books': books,
-                                             'urls': books_lst,
-                                             'user_books_list': user_books_list,
-                                             })
+                                                 'urls': books_lst,
+                                                 'user_books_list': user_books_list,
+                                                 })
 
     else:
         return render(request, 'homepage.html', {'books': books,
@@ -57,9 +58,6 @@ def thanks_view(request):
     current_user = OverdriveUser.objects.get(id=request.user.id)
     book = Book.objects.get(title=title)
 
-    # hold_list = [user for user in book.hold_list.all()]
-    # print(hold_list+'heyy')
-    
     current_user.books_checked_out.add(book)
     current_user.save()
 
@@ -175,7 +173,8 @@ def login_view(request):
 
     if form.is_valid():
         data = form.cleaned_data
-        user = authenticate(username=data['username'], password=data['password'])
+        user = authenticate(
+            username=data['username'], password=data['password'])
 
         if user is not None:
             login(request, user)
