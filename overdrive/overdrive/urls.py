@@ -18,7 +18,7 @@ from django.urls import path
 from overdrive.models import Book, OverdriveUser
 from overdrive.views import (content_view, hold_view, home_view, login_view,
                              LogoutView, mybooks_view, return_view,
-                             signup_view, thanks_view, handler404, handler500)
+                             signup_view, thanks_view, Handler404, Handler500)
 
 admin.site.register(Book)
 admin.site.register(OverdriveUser)

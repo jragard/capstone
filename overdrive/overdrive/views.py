@@ -1,11 +1,11 @@
 from overdrive.forms import SignupForm, LoginForm
 from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
-from django.shortcuts import reverse, render, render_to_response, HttpResponseRedirect, HttpResponse
+from django.shortcuts import (reverse, render, render_to_response,
+                              HttpResponseRedirect, HttpResponse)
 from django.contrib.auth import login, authenticate, logout
 from django.db import IntegrityError
 from django.views import generic
-from django.template import RequestContext
 
 import datetime
 
@@ -13,43 +13,41 @@ import datetime
 def home_view(request):
 
     books = Book.objects.all()
-    books_lst = []
+    today = datetime.datetime.now().date()
 
     if request.user.is_authenticated:
-        current_user = OverdriveUser.objects.get(id=request.user.id)
+        current_user = request.user.overdriveuser
         user_books_list = [book.title for book in
                            current_user.books_checked_out.all()]
 
         for book in books:
+            if str(book.due_date) == str(today):
+                current_user.books_checked_out.remove(book)
+                book.checked_out_count -= 1
+                book.save()
             if book.checked_out_count < 0:
                 book.checked_out_count = 0
                 book.save()
 
-        for x in books:
-            books_lst.append(x.title.replace(' ', '_'))
-
         return render(request, 'homepage.html', {'books': books,
-                                                 'urls': books_lst,
                                                  'user_books_list': user_books_list,
                                                  })
 
     else:
         return render(request, 'homepage.html', {'books': books,
-                                                 'urls': books_lst})
+                                                })
 
 
 def mybooks_view(request):
 
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
+
     current_user = OverdriveUser.objects.get(id=request.user.id)
+    books = current_user.books_checked_out.all()
 
-    books_list = []
-
-    for book in current_user.books_checked_out.all():
-        books_list.append(book.title)
-
-    return render(request, 'mybooks.html', {'books': books_list})
+    return render(request, 'mybooks.html', {'books': books
+                                            })
 
 
 def thanks_view(request):
@@ -129,9 +127,12 @@ def content_view(request, url):
             return render(request, content_html)
     if url not in books_list and book.checked_out_count == book.no_of_licenses:
         return render(request, unavailable_html, {'title': url.replace('_', ' '),
-                                                  'url': url})
+                                                  'url': url,
+                                                  'book': book})
     else:
-        return render(request, html, {'title': url.replace('_', ' ')})
+        return render(request, html, {'title': url.replace('_', ' '),
+                                      'book': book
+                                      })
 
 
 def signup_view(request):
@@ -192,21 +193,21 @@ def login_view(request):
     return render(request, html, {'form': form})
 
 
-
 class LogoutView(generic.View):
     def get(self, request):
         logout(request)
         return HttpResponseRedirect(reverse('homepage'))
 
 
-def handler404(request, exception, template_name="404.html"):
-    response = render_to_response("404.html")
-    response.status_code = 404
-    return response
+class Handler404(generic.View):
+    def get(self, request, exception, template_name="404.html"):
+        response = render_to_response("404.html")
+        response.status_code = 404
+        return response
 
 
-def handler500(request, exception, template_name="500.html"):
-    response = render_to_response("500.html")
-    response.status_code = 500
-    return response
-
+class Handler500(generic.View):
+    def get(self, request, exception, template_name="500.html"):
+        response = render_to_response("500.html")
+        response.status_code = 500
+        return response
