@@ -192,21 +192,21 @@ def login_view(request):
     return render(request, html, {'form': form})
 
 
-
 class LogoutView(generic.View):
     def get(self, request):
         logout(request)
         return HttpResponseRedirect(reverse('homepage'))
 
 
-def handler404(request, exception, template_name="404.html"):
-    response = render_to_response("404.html")
-    response.status_code = 404
-    return response
+class Handler404(generic.View):
+    def get(self, request, exception, template_name="404.html"):
+        response = render_to_response("404.html")
+        response.status_code = 404
+        return response
 
 
-def handler500(request, exception, template_name="500.html"):
-    response = render_to_response("500.html")
-    response.status_code = 500
-    return response
-
+class Handler500(generic.View):
+    def get(self, request, exception, template_name="500.html"):
+        response = render_to_response("500.html")
+        response.status_code = 500
+        return response
