@@ -49,10 +49,6 @@ def mybooks_view(request):
     return render(request, 'mybooks.html', {'books': books_list})
 
 
-def checkout_view(request, url):
-    pass
-
-
 def thanks_view(request):
     title = request.POST.get('title').replace(' ', '_')
     current_user = OverdriveUser.objects.get(id=request.user.id)
@@ -97,8 +93,8 @@ def return_view(request, url):
         book_to_return.hold_list.remove(current_user.user)
         book_to_return.save()
 
-
-    # print(current_user.books_checked_out)
+        book_to_return.checked_out_count += 1
+        book_to_return.save()
 
     return render(request, 'return_thanks.html')
 
@@ -124,8 +120,10 @@ def content_view(request, url):
     current_user = OverdriveUser.objects.get(id=request.user.id)
     book = Book.objects.get(title=url)
     books_list = [bk for bk in current_user.books_checked_out.all()]
+    # print(books_list)
 
     for bk in books_list:
+        print(book.checked_out_count)
         if url == bk.title:
             return render(request, content_html)
     if url not in books_list and book.checked_out_count == 3:
