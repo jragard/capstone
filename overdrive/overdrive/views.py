@@ -1,8 +1,11 @@
 from overdrive.forms import SignupForm, LoginForm
 from overdrive.models import OverdriveUser, Book
 from django.contrib.auth.models import User
-from django.shortcuts import reverse, render, HttpResponseRedirect
+from django.shortcuts import reverse, render, render_to_response, HttpResponseRedirect, HttpResponse
 from django.contrib.auth import login, authenticate, logout
+from django.db import IntegrityError
+from django.views import generic
+from django.template import RequestContext
 
 import datetime
 
@@ -142,10 +145,19 @@ def signup_view(request):
 
     if form.is_valid():
         data = form.cleaned_data
-
-        user = User.objects.create_user(
-            data['username'], data['email'], data['password']
-        )
+        try:
+            print ("inside signup")
+            user = User.objects.create_user(
+                data['username'], data['email'], data['password']
+            )
+        except IntegrityError:
+            print ("inside signup222")
+            return HttpResponse(
+                'This username has already been taken. '
+                'Please choose a different name.'
+                '<br/> <br/>'
+                '<button onClick="window.history.back()">Get Back</button>'
+                )
 
         OverdriveUser.objects.create(
             username=data['username'],
@@ -180,7 +192,21 @@ def login_view(request):
     return render(request, html, {'form': form})
 
 
-def logout_view(request):
 
-    logout(request)
-    return HttpResponseRedirect(reverse('homepage'))
+class LogoutView(generic.View):
+    def get(self, request):
+        logout(request)
+        return HttpResponseRedirect(reverse('homepage'))
+
+
+def handler404(request, exception, template_name="404.html"):
+    response = render_to_response("404.html")
+    response.status_code = 404
+    return response
+
+
+def handler500(request, exception, template_name="500.html"):
+    response = render_to_response("500.html")
+    response.status_code = 500
+    return response
+
