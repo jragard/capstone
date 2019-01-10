@@ -13,13 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.urls import path
 from django.contrib import admin
-
+from django.urls import path
 from overdrive.models import Book, OverdriveUser
-from overdrive.views import (home_view, signup_view, login_view, logout_view,
-                             content_view, mybooks_view, thanks_view,
-                             return_view, hold_view)
+from overdrive.views import (content_view, hold_view, home_view, login_view,
+                             LogoutView, mybooks_view, return_view,
+                             signup_view, thanks_view, handler404, handler500)
 
 admin.site.register(Book)
 admin.site.register(OverdriveUser)
@@ -29,7 +28,7 @@ urlpatterns = [
     path('', home_view, name='homepage'),
     path('signup/', signup_view),
     path('login/', login_view, name='login'),
-    path('logout/', logout_view),
+    path('logout/', LogoutView.as_view()),
     path('mybooks/', mybooks_view, name='mybooks'),
     path('thanks/', thanks_view),
     path('html/content/<str:url>', content_view),
