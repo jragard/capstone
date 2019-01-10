@@ -2,8 +2,9 @@
 
 <a href="/">Home</a>
 <p></p>
+
 {% for book in books %}
     <li>
-        <a href="/html/content/{{book}}">{{ book }}</a>
+        <a href="/html/content/{{book}}">{{ book.title }}</a> - Due Date: {{ book.due_date }}
     </li>
 {% endfor %}

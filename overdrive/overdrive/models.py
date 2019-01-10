@@ -8,6 +8,7 @@ class Book(models.Model):
     hold_list = models.ManyToManyField(User, default=None)
     no_of_licenses = models.IntegerField(default=0)
     due_date = models.DateField(auto_now=False, auto_now_add=False)
+    description = models.TextField(max_length=2000)
 
     def __str__(self):
         return self.title
