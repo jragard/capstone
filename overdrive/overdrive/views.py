@@ -146,10 +146,17 @@ def signup_view(request):
 
     if form.is_valid():
         data = form.cleaned_data
-
-        user = User.objects.create_user(
-            data['username'], data['email'], data['password']
-        )
+        try:
+            user = User.objects.create_user(
+                data['username'], data['email'], data['password']
+            )
+        except IntegrityError:
+            return HttpResponse(
+                'This username has already been taken. '
+                'Please choose a different name.'
+                '<br/> <br/>'
+                '<button onClick="window.history.back()">Get Back</button>'
+                )
 
         OverdriveUser.objects.create(
             username=data['username'],
