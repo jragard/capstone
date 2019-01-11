@@ -29,13 +29,12 @@ def home_view(request):
                 book.checked_out_count = 0
                 book.save()
 
-        return render(request, 'homepage.html', {'books': books,
-                                                 'user_books_list': user_books_list,
-                                                 })
+        return render(request, 'homepage.html',
+                      {'books': books, 'user_books_list': user_books_list})
 
     else:
         return render(request, 'homepage.html', {'books': books,
-                                                })
+                                                 })
 
 
 def mybooks_view(request):
@@ -43,7 +42,7 @@ def mybooks_view(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
 
-    current_user = OverdriveUser.objects.get(id=request.user.id)
+    current_user = request.user.overdriveuser
     books = current_user.books_checked_out.all()
 
     return render(request, 'mybooks.html', {'books': books
@@ -53,7 +52,7 @@ def mybooks_view(request):
 def thanks_view(request):
 
     title = request.POST.get('title').replace(' ', '_')
-    current_user = OverdriveUser.objects.filter(id=request.user.id).first()
+    current_user = request.user.overdriveuser
     book = Book.objects.get(title=title)
 
     current_user.books_checked_out.add(book)
@@ -100,7 +99,7 @@ def return_view(request, url):
 
 def hold_view(request, url):
 
-    current_user = OverdriveUser.objects.get(id=request.user.id)
+    current_user = request.user.overdriveuser
     book_to_hold = Book.objects.get(title=url)
 
     book_to_hold.hold_list.add(current_user.user)
@@ -118,7 +117,7 @@ def content_view(request, url):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse('login'))
 
-    current_user = OverdriveUser.objects.get(id=request.user.id)
+    current_user = request.user.overdriveuser
     book = Book.objects.get(title=url)
     books_list = [bk for bk in current_user.books_checked_out.all()]
 
@@ -126,9 +125,11 @@ def content_view(request, url):
         if url == bk.title:
             return render(request, content_html)
     if url not in books_list and book.checked_out_count == book.no_of_licenses:
-        return render(request, unavailable_html, {'title': url.replace('_', ' '),
-                                                  'url': url,
-                                                  'book': book})
+        return render(request, unavailable_html,
+                      {'title': url.replace('_', ' '),
+                       'url': url,
+                       'book': book
+                       })
     else:
         return render(request, html, {'title': url.replace('_', ' '),
                                       'book': book
