@@ -1,0 +1,3 @@
+This project is a clone of Overdrive.  Users can log in, browse e-books, and check them out for limited periods of time to access the content.  
+
+If you are testing this project, you will need to manually add books to the database via the django admin panel.  You will need to enter their titles in the format "A_Christmas_Carol" with underscores for spaces.  Also, currently when adding a new book via the admin panel, it requires you to choose at least one user to place on the book's "hold list".  This will be fixed eventually, but to avoid data errors, after adding any books, log in as the admin user and simply return any books that admin may inadvertently have checked out.  Then, all is good to go.
